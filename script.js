@@ -37,88 +37,46 @@ function showProduct(data: Product) {
   </div>
   `;
 } */
-/* fetchCursos();
-
-interface Curso {
-  nome: string;
-  horas: number;
-  aulas: number;
-  gratuito: boolean;
-  tags: string[];
-  idAulas: number[];
-  nivel: "iniciante" | "avancado";
-}
-
-async function fetchCursos() {
-  const response = await fetch("https://api.origamid.dev/json/cursos.json");
-  const data = await response.json();
-  mostrarCursos(data);
-}
-
-function mostrarCursos(cursos: Curso[]) {
-  cursos.forEach((curso) => {
-    let color;
-    if (curso.nivel === "iniciante") {
-      color = "blue";
-    } else if (curso.nivel === "avancado") {
-      color = "red";
+window.UserData = {};
+function isUserData(obj) {
+    if (obj &&
+        typeof obj === "object" &&
+        ("nome" in obj || "email" in obj || "cpf" in obj)) {
+        return true;
     }
-    document.body.innerHTML += `
-  <div>
-  <h2 style='color: ${color}'>${curso.nome}</h2>
-  <p>Horas: ${curso.horas}</p>
-  <p>Aulas: ${curso.aulas}</p>
-  <p>Tipo: ${curso.gratuito ? "Gratuito" : "Pago"}</p>
-  <p>Tags: ${curso.tags.join(", ")}</p>
-  <p>Aulas: ${curso.idAulas.join(" | ")}</p>
-  </div>
-  `;
-  });
+    else {
+        return false;
+    }
 }
- */
-/* const link = document.getElementById("origamid");
-
-if (link instanceof HTMLAnchorElement) {
-  link.href = link.href.replace("http://", "https://");
-} */
-/*
-const links = document.querySelectorAll(".link");
-
-links.forEach((item) => {
-  if (item instanceof HTMLElement) {
-    ativarElemento(item);
-  }
-});
-
-function ativarElemento(elemento: HTMLElement) {
-  elemento.style.color = "purple";
-  elemento.style.border = "2px solid purple";
-} */
-// Estado dos elementos
-// menu inativo:
-// class="" em nav
-// aria-expanded="false" em button
-// aria-label="Abrir Menu" em button
-// menu ativo:
-// class="active" em nav
-// aria-expanded="true" em button
-// aria-label="Fechar Menu" em button
-const btnMobile = document.getElementById("btn-mobile");
-function toggleMenu(event) {
-    const button = event.currentTarget;
-    const nav = document.getElementById("nav");
-    if (button instanceof HTMLElement && nav) {
-        const active = nav.classList.contains("active");
-        if (active) {
-            nav.classList.remove("active");
-            button.setAttribute("aria-expanded", "false");
-            button.setAttribute("aria-label", "Abrir Menu");
-        }
-        else {
-            nav.classList.add("active");
-            button.setAttribute("aria-expanded", "true");
-            button.setAttribute("aria-label", "Fechar Menu");
+function validJSON(str) {
+    try {
+        JSON.parse(str);
+    }
+    catch (e) {
+        return false;
+    }
+    return true;
+}
+function loadLocalStorage() {
+    const localUserData = localStorage.getItem("UserData");
+    if (localUserData && validJSON(localUserData)) {
+        const UserData = JSON.parse(localUserData);
+        if (isUserData(UserData)) {
+            Object.entries(UserData).forEach(([key, value]) => {
+                const input = document.getElementById(key);
+                if (input instanceof HTMLInputElement) {
+                    input.value = value;
+                    window.UserData[key] = value;
+                }
+            });
         }
     }
 }
-btnMobile?.addEventListener("pointerdown", toggleMenu);
+function handleInput({ target }) {
+    if (target instanceof HTMLInputElement) {
+        window.UserData[target.id] = target.value;
+        localStorage.setItem("UserData", JSON.stringify(window.UserData));
+    }
+}
+const form = document.querySelector("#form");
+form?.addEventListener("keyup", handleInput);

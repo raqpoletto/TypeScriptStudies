@@ -108,7 +108,7 @@ function ativarElemento(elemento: HTMLElement) {
 // aria-expanded="true" em button
 // aria-label="Fechar Menu" em button
 
-const btnMobile = document.getElementById("btn-mobile");
+/* const btnMobile = document.getElementById("btn-mobile");
 
 function toggleMenu(event: PointerEvent) {
   const button = event.currentTarget;
@@ -128,4 +128,140 @@ function toggleMenu(event: PointerEvent) {
   }
 }
 
-btnMobile?.addEventListener("pointerdown", toggleMenu);
+btnMobile?.addEventListener("pointerdown", toggleMenu); */
+
+// Crie uma função que arredonda um valor passado para cima.
+// A função pode receber string ou number.
+// A função deve retornar o mesmo tipo que ela receber.
+
+/* function arredondado(valor: number): number;
+function arredondado(valor: string): string;
+function arredondado(valor: number | string): number | string {
+  if (typeof valor === "number") {
+    return Math.ceil(valor);
+  } else {
+    return Math.ceil(Number(valor)).toString();
+  }
+}
+
+console.log(arredondado(200.32));
+console.log(arredondado("200.32")); */
+
+// 1 - Faça um fetch da API: https://api.origamid.dev/json/cursos.json
+// 2 - Defina a interface da API
+// 3 - Crie um Type Guard, que garanta que a API possui nome, horas e tags
+// 4 - Use Type Guards para garantir a Type Safety do código
+// 5 - Preencha os dados da API na tela.
+
+/* async function fetchCursos() {
+  const response = await fetch("https://api.origamid.dev/json/cursos.json");
+  const json = await response.json();
+  handleCursos(json);
+}
+fetchCursos();
+
+interface Curso {
+  nome: string;
+  horas: number;
+  aulas: number;
+  gratuito: boolean;
+  tags: string[];
+  idAulas: number[];
+  nivel: "iniciante" | "avancado";
+}
+
+function isCurso(curso: unknown): curso is Curso {
+  if (
+    curso &&
+    typeof curso === "object" &&
+    "nome" in curso &&
+    "horas" in curso &&
+    "tags" in curso
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function handleCursos(data: unknown) {
+  if (Array.isArray(data)) {
+    data.filter(isCurso).forEach((item) => {
+      document.body.innerHTML += `
+        <div>
+          <h2>${item.nome}</h2>
+          <p>${item.horas}</p>
+          <p>${item.tags.join(", ")}</p>
+        </div>
+      `;
+    });
+  }
+} */
+
+// 1 - Crie uma interface UserData para o formulário abaixo
+// 2 - Crie uma variável global UserData no window, ela será um objeto qualquer
+// 3 - Adicione um evento de keyup ao formulário
+// 4 - Quando o evento ocorrer adicione a {[id]: value} ao UserData
+// 5 - Salve UserData no localStorage
+// 6 - Crie uma User Type Guard, para verificar se o valor de localStorage é compatível com UserData
+// 7 - Ao refresh da página, preencha os valores de localStorage (caso seja UserData) no formulário e em window.UserData
+
+interface UserData {
+  nome?: string;
+  email?: string;
+  cpf?: string;
+}
+
+interface Window {
+  UserData: any;
+}
+
+window.UserData = {};
+
+function isUserData(obj: unknown): obj is UserData {
+  if (
+    obj &&
+    typeof obj === "object" &&
+    ("nome" in obj || "email" in obj || "cpf" in obj)
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function validJSON(str: string) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
+function loadLocalStorage() {
+  const localUserData = localStorage.getItem("UserData");
+  if (localUserData && validJSON(localUserData)) {
+    const UserData = JSON.parse(localUserData);
+    if (isUserData(UserData)) {
+      Object.entries(UserData).forEach(([key, value]) => {
+        const input = document.getElementById(key);
+        if (input instanceof HTMLInputElement) {
+          input.value = value;
+          window.UserData[key] = value;
+        }
+      });
+    }
+  }
+}
+
+function handleInput({ target }: KeyboardEvent) {
+  if (target instanceof HTMLInputElement) {
+    window.UserData[target.id] = target.value;
+    localStorage.setItem("UserData", JSON.stringify(window.UserData));
+  }
+}
+
+const form = document.querySelector<HTMLFormElement>("#form");
+
+form?.addEventListener("keyup", handleInput);
